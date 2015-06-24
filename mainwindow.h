@@ -5,6 +5,8 @@
 #include <QWidget>
 #include <QPointer>
 
+extern const QSize g_k_windowSize;
+
 namespace Ui {
 class MainWindow;
 }
@@ -20,7 +22,7 @@ public:
 private slots:
     void InitWelcomePage();
     void InitStartGamePage();
-    void InitLoagGamePage();
+    void InitLoadGamePage();
     void InitEmptyChessBoardPage();
 
 private:
