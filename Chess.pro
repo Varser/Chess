@@ -13,8 +13,16 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    welcome_page_widget.cpp \
+    startgame_page_widget.cpp \
+    loadgame_page_widget.cpp \
+    emptychessboard_page_widget.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    welcome_page_widget.h \
+    startgame_page_widget.h \
+    loadgame_page_widget.h \
+    emptychessboard_page_widget.h
 
 FORMS    += mainwindow.ui
