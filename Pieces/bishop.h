@@ -3,16 +3,17 @@
 
 #include "piece.h"
 
-class Bishop : public /*Piece, */QSvgWidget
+class Bishop : /*public QSvgWidget,*/ public Piece
 {
-    Q_OBJECT
+//    Q_OBJECT
 public:
     Bishop(Color position, QWidget *parent = 0);
     virtual void SetPosition(Coords);
+    virtual bool MayIGoHere(QPoint position, QPoint prev_position, QPointer<Player>& friends, QPointer<Player>& enemies);
 
-signals:
+//signals:
 
-public slots:
+//public slots:
 };
 
 #endif // BISHOP_H

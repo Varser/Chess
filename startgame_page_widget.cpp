@@ -4,11 +4,16 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 
+#include<QSize>
+
+extern const QSize g_k_windowSize;
+
 StartGame_page_widget::StartGame_page_widget(QWidget *parent) :
     QWidget(parent),
     m_chessBoard(this),
     m_menu(this)
 {
+    this->setGeometry(0, 0, g_k_windowSize.width(), g_k_windowSize.height());
     //Add ChessBoard
     QVBoxLayout * v_layout = new QVBoxLayout(this);
     v_layout->addWidget(&m_chessBoard);

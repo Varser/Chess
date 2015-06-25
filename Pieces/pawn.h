@@ -3,16 +3,17 @@
 
 #include "piece.h"
 
-class Pawn : public /*Piece, */QSvgWidget
+class Pawn : /*public QSvgWidget,*/ public Piece
 {
-    Q_OBJECT
+//    Q_OBJECT
 public:
     Pawn(Color position, QWidget *parent = 0);
     virtual void SetPosition(Coords);
+    virtual bool MayIGoHere(QPoint position, QPoint prev_position, QPointer<Player>& friends, QPointer<Player>& enemies);
 
-signals:
+//signals:
 
-public slots:
+//public slots:
 };
 
 #endif // PAWN_H
