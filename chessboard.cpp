@@ -2,6 +2,7 @@
 
 #include <QString>
 #include <cassert>
+#include "logger.h"
 
 
 const QString k_backgroundFilePath = ":/Images/Chess_Board.svg";
@@ -32,6 +33,7 @@ void ChessBoard::StartGame()
 
 void ChessBoard::StopGame()
 {
+    Logger::GetLogger().clearLog();
     this->setMouseTracking(false);
 }
 
@@ -62,6 +64,7 @@ void ChessBoard::mouseReleaseEvent(QMouseEvent * event)
                                 (GetActivePlayer() == m_whitePlayer)?m_whitePlayer:m_blackPlayer,
                                 (GetActivePlayer() == m_whitePlayer)?m_blackPlayer:m_whitePlayer))
     {
+        Logger::GetLogger().AddToLog(position);
         m_piece->SetPosition(position);
         ChangeActivePlayer();
     }
@@ -94,4 +97,11 @@ void ChessBoard::ChangeActivePlayer()
     m_whitePlayer->SetActivePlayer(!m_whitePlayer->isActivePlayer());
     m_blackPlayer->SetActivePlayer(!m_blackPlayer->isActivePlayer());
 }
+
+void ChessBoard::SetActivePlayerPieceCoordinates(Coordinates current, Coordinates prev)
+{
+    GetActivePlayer()->GetPiece(prev)->SetPosition(current);
+}
+
+]
 

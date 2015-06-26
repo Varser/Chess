@@ -22,10 +22,11 @@ public:
     void mousePressEvent(QMouseEvent * event);
     void mouseReleaseEvent(QMouseEvent * event);
     void mouseMoveEvent(QMouseEvent * event);
+    void ChangeActivePlayer();
+    void SetActivePlayerPieceCoordinates(Coordinates current, Coordinates prev);
 
 private:
     QPointer<Player> GetActivePlayer();
-    void ChangeActivePlayer();
 
 private:
     QPointer<Player>    m_whitePlayer,

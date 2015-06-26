@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     Pieces/queen.cpp \
     Pieces/knight.cpp \
     Pieces/pawn.cpp \
-    Pieces/rook.cpp
+    Pieces/rook.cpp \
+    logger.cpp
 
 HEADERS  += mainwindow.h \
     welcome_page_widget.h \
@@ -41,7 +42,8 @@ HEADERS  += mainwindow.h \
     Pieces/queen.h \
     Pieces/knight.h \
     Pieces/pawn.h \
-    Pieces/rook.h
+    Pieces/rook.h \
+    logger.h
 
 FORMS    += mainwindow.ui
 

@@ -6,6 +6,8 @@
 
 #include<QSize>
 
+#include "logger.h"
+
 extern const QSize g_k_windowSize;
 
 StartGame_page_widget::StartGame_page_widget(QWidget *parent) :
@@ -28,10 +30,10 @@ StartGame_page_widget::StartGame_page_widget(QWidget *parent) :
     h_layout->addWidget(button);
     this->connect(button, SIGNAL(clicked()), this->parent(), SLOT(InitWelcomePage()));
 
-    //Add Load Game Button
-    button= new QPushButton("Load Game", this);
+    //Add Save Game Button
+    button= new QPushButton("Save Game", this);
     h_layout->addWidget(button);
-    this->connect(button, SIGNAL(clicked()), this->parent(), SLOT(InitLoadGamePage()));
+    this->connect(button, SIGNAL(clicked()), this, SLOT(SaveGame()));
 
     //Add Empty Chess Board Button
     button= new QPushButton("Empty Chess Board", this);
@@ -43,5 +45,10 @@ StartGame_page_widget::StartGame_page_widget(QWidget *parent) :
     this->connect(button, SIGNAL(clicked()), this->parent(), SLOT(close()));
     h_layout->addWidget(button);
     m_chessBoard.InitPlayers();
+}
+
+void StartGame_page_widget::SaveGame()
+{
+    Logger::GetLogger().SaveLog();
 }
 

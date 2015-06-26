@@ -4,6 +4,8 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 
+#include "logger.h"
+
 LoadGame_page_widget::LoadGame_page_widget(QWidget *parent) :
     QWidget(parent),
     m_chessBoard(this),
@@ -38,5 +40,21 @@ LoadGame_page_widget::LoadGame_page_widget(QWidget *parent) :
     this->connect(button, SIGNAL(clicked()), this->parent(), SLOT(close()));
     h_layout->addWidget(button);
     m_chessBoard.InitPlayers();
+}
+
+void LoadGame_page_widget::Prev()
+{
+    Logger::GetLogger().GoToPrevMove();
+    m_chessBoard->SetActivePlayerPieceCoordinates(Logger::GetLogger().GetMove());
+}
+
+void LoadGame_page_widget::Next()
+{
+    Logger::GetLogger().GoToNextMove();
+    m_chessBoard->SetActivePlayerPieceCoordinates(Logger::GetLogger().GetMove());
+}
+void LoadGame_page_widget::StartFromThis()
+{
+    m_chessBoard->StartGame();
 }
 

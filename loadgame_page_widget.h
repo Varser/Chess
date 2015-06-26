@@ -10,6 +10,10 @@ class LoadGame_page_widget : public QWidget
 public:
     explicit LoadGame_page_widget(QWidget *parent = 0);
 
+    void StartFromThis();
+    void Next();
+    void Prev();
+
 private:
     ChessBoard m_chessBoard;
     QWidget m_menu;
