@@ -13,13 +13,7 @@ Pawn::Pawn(Color position, QWidget *parent) :
     this->setFixedSize(g_k_PieceSize);
 }
 
-void Pawn::SetPosition(Coords pos)
-{
-    this->m_position = pos.AbstractCoords();
-    this->move(pos.RealCoords());
-}
-
-bool Pawn::MayIGoHere(QPoint position, QPoint prev_position, QPointer<Player>& friends, QPointer<Player>& enemies)
+bool Pawn::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player>& friends, QPointer<Player>& enemies)
 {
     if ((position.x() == prev_position.x()) && (position.y() == prev_position.y()))
         return false;
@@ -33,7 +27,7 @@ bool Pawn::MayIGoHere(QPoint position, QPoint prev_position, QPointer<Player>& f
         dy = position.y() - prev_position.y();
         if ((dy == 1) && ((dx == 1) || (dx == -1)))
         {
-            piece = enemies->GetPiece(Coords(position.x(), position.y()));
+            piece = enemies->GetPiece(position);
             if (!piece.isNull())
             {
                 enemies->RemovePiece(piece);
@@ -49,7 +43,7 @@ bool Pawn::MayIGoHere(QPoint position, QPoint prev_position, QPointer<Player>& f
         dy = prev_position.y() - position.y();
         if ((dy == 1) && ((dx == 1) || (dx == -1)))
         {
-            piece = enemies->GetPiece(Coords(position.x(), position.y()));
+            piece = enemies->GetPiece(position);
             if (!piece.isNull())
             {
                 enemies->RemovePiece(piece);
@@ -63,9 +57,9 @@ bool Pawn::MayIGoHere(QPoint position, QPoint prev_position, QPointer<Player>& f
     }
     for (int y = position.y(); y != prev_position.y(); (position.y() < prev_position.y())?++y:--y)
     {
-        if (!friends->GetAnotherPiece(Coords(position.x(), y), this).isNull())
+        if (!friends->GetAnotherPiece(Coordinates(position.x(), y), this).isNull())
             return false;
-        if (!enemies->GetPiece(Coords(position.x(), y)).isNull())
+        if (!enemies->GetPiece(Coordinates(position.x(), y)).isNull())
             return false;
     }
     return true;

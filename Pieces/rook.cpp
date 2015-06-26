@@ -13,13 +13,7 @@ Rook::Rook(Color position, QWidget *parent) :
     this->setFixedSize(g_k_PieceSize);
 }
 
-void Rook::SetPosition(Coords pos)
-{
-    this->m_position = pos.AbstractCoords();
-    this->move(pos.RealCoords());
-}
-
-bool Rook::MayIGoHere(QPoint position, QPoint prev_position, QPointer<Player>& friends, QPointer<Player>& enemies)
+bool Rook::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player>& friends, QPointer<Player>& enemies)
 {
     if ((position.x() == prev_position.x()) && (position.y() == prev_position.y()))
         return false;
@@ -34,9 +28,9 @@ bool Rook::MayIGoHere(QPoint position, QPoint prev_position, QPointer<Player>& f
     case true:
         for (int y = position.y(); y != prev_position.y(); (position.y() < prev_position.y())?++y:--y)
         {
-            if (!(friends->GetAnotherPiece(Coords(position.x(), y), this).isNull()))
+            if (!(friends->GetAnotherPiece(Coordinates(position.x(), y), this).isNull()))
                 return false;
-            piece = enemies->GetAnotherPiece(Coords(position.x(), y), this);
+            piece = enemies->GetAnotherPiece(Coordinates(position.x(), y), this);
             if (!piece.isNull())
             {
                 if (y == position.y())
@@ -49,9 +43,9 @@ bool Rook::MayIGoHere(QPoint position, QPoint prev_position, QPointer<Player>& f
     case false:
         for (int x = position.x(); x != prev_position.x(); (position.x() < prev_position.x())?++x:--x)
         {
-            if (!(friends->GetAnotherPiece(Coords(x, position.y()), this).isNull()))
+            if (!(friends->GetAnotherPiece(Coordinates(x, position.y()), this).isNull()))
                 return false;
-            piece = enemies->GetPiece(Coords(x, position.y()));
+            piece = enemies->GetPiece(Coordinates(x, position.y()));
             if (!piece.isNull())
             {
                 if (x == position.x())

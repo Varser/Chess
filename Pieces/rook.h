@@ -3,17 +3,11 @@
 
 #include "piece.h"
 
-class Rook : /*public QSvgWidget,*/ public Piece
+class Rook : public Piece
 {
-//    Q_OBJECT
 public:
     Rook(Color position, QWidget *parent = 0);
-    virtual void SetPosition(Coords pos);
-    virtual bool MayIGoHere(QPoint position, QPoint prev_position, QPointer<Player>& friends, QPointer<Player>& enemies);
-
-//signals:
-
-//public slots:
+    virtual bool MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player>& friends, QPointer<Player>& enemies);
 };
 
 #endif // ROOK_H

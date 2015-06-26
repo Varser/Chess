@@ -13,13 +13,7 @@ Knight::Knight(Color position, QWidget *parent) :
     this->setFixedSize(g_k_PieceSize);
 }
 
-void Knight::SetPosition(Coords pos)
-{
-    this->m_position = pos.AbstractCoords();
-    this->move(pos.RealCoords());
-}
-
-bool Knight::MayIGoHere(QPoint position, QPoint prev_position, QPointer<Player>& friends, QPointer<Player>& enemies)
+bool Knight::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player>& friends, QPointer<Player>& enemies)
 {
     int dx = position.x() - prev_position.x();
     int dy = position.y() - prev_position.y();
@@ -30,9 +24,9 @@ bool Knight::MayIGoHere(QPoint position, QPoint prev_position, QPointer<Player>&
     if (!(((dx == 2) && (dy == 1)) ||
             ((dx == 1) && (dy == 2))))
         return false;
-    if (!friends->GetAnotherPiece(Coords(position.x(), position.y()), this).isNull())
+    if (!friends->GetAnotherPiece(position, this).isNull())
         return false;
-    QPointer<Piece> piece = enemies->GetPiece(Coords(position.x(), position.y()));
+    QPointer<Piece> piece = enemies->GetPiece(position);
     if (!piece.isNull())
     {
         enemies->RemovePiece(piece);

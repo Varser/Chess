@@ -14,13 +14,7 @@ King::King(Color position, QWidget *parent) :
     this->setFixedSize(g_k_PieceSize);
 }
 
-void King::SetPosition(Coords pos)
-{
-    this->m_position = pos.AbstractCoords();
-    this->move(pos.RealCoords());
-}
-
-bool King::MayIGoHere(QPoint position, QPoint prev_position, QPointer<Player>& friends, QPointer<Player>& enemies)
+bool King::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player>& friends, QPointer<Player>& enemies)
 {
     if ((position.x() == prev_position.x()) && (position.y() == prev_position.y()))
         return false;
@@ -34,9 +28,9 @@ bool King::MayIGoHere(QPoint position, QPoint prev_position, QPointer<Player>& f
     if (!((dx < 2) &&
             (dy < 2)))
         return false;
-    if (!friends->GetAnotherPiece(Coords(position.x(), position.y()), this).isNull())
+    if (!friends->GetAnotherPiece(position, this).isNull())
         return false;
-    QPointer<Piece> piece = enemies->GetPiece(Coords(position.x(), position.y()));
+    QPointer<Piece> piece = enemies->GetPiece(position);
     if (!piece.isNull())
     {
         enemies->RemovePiece(piece);

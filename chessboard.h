@@ -18,6 +18,7 @@ public:
     void InitPlayers();
     QPair<QPointer<Player>, QPointer<Player> > GetPlayers();
     void StartGame();
+    void StopGame();
     void mousePressEvent(QMouseEvent * event);
     void mouseReleaseEvent(QMouseEvent * event);
     void mouseMoveEvent(QMouseEvent * event);
@@ -32,7 +33,7 @@ private:
 
 private:
     QPointer<Piece> m_piece;
-    QPoint m_savedCoords;
+    Coordinates m_savedCoords;
 signals:
 
 public slots:

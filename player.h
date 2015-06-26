@@ -15,15 +15,16 @@ class Player : public QWidget
 public:
     explicit Player(QWidget *parent = 0);
     void Init(Color);
-    bool UnderCheck(Coords);
     bool isActivePlayer();
     void SetActivePlayer(bool enable);
-    QPointer<Piece> GetPiece(Coords position);
-    QPointer<Piece> GetAnotherPiece(Coords position, QPointer<Piece> excluded);
+    QPointer<Piece> GetPiece(Coordinates coordinates);
+    QPointer<Piece> GetAnotherPiece(Coordinates coordinates, QPointer<Piece> excluded);
     void RemovePiece(QPointer<Piece> piece);
+    inline bool isLoose() const {return m_pieces.size();}
 
 private:
     QVector<QPointer<Piece> > m_pieces;
+    QPointer<Piece> m_king;
     bool m_active;
 
 signals:

@@ -30,6 +30,11 @@ void ChessBoard::StartGame()
     this->setMouseTracking(true);
 }
 
+void ChessBoard::StopGame()
+{
+    this->setMouseTracking(false);
+}
+
 QPair<QPointer<Player>, QPointer<Player> > ChessBoard::GetPlayers()
 {
     assert(m_whitePlayer);
@@ -39,9 +44,9 @@ QPair<QPointer<Player>, QPointer<Player> > ChessBoard::GetPlayers()
 
 void ChessBoard::mousePressEvent(QMouseEvent * event)
 {
-    QPoint position = event->pos();
+    Coordinates position(event->pos(), true);
     QPointer<Player> player = GetActivePlayer();
-    m_piece = player->GetPiece(Coords(position));
+    m_piece = player->GetPiece(position);
     if (m_piece.isNull())
         return;
     m_savedCoords = position;
@@ -49,30 +54,30 @@ void ChessBoard::mousePressEvent(QMouseEvent * event)
 
 void ChessBoard::mouseReleaseEvent(QMouseEvent * event)
 {
-    QPoint position = event->pos();
+    Coordinates position(event->pos(), true);
     if (m_piece.isNull())
         return;
-    if ((position.x() != m_savedCoords.x()) &&
-            (position.y() != m_savedCoords.y()) &&
-            m_piece->MayIGoHere(Coords(position).AbstractCoords(),
-                                Coords(m_savedCoords).AbstractCoords(),
+    if (m_piece->MayIGoHere(position,
+                                m_savedCoords,
                                 (GetActivePlayer() == m_whitePlayer)?m_whitePlayer:m_blackPlayer,
                                 (GetActivePlayer() == m_whitePlayer)?m_blackPlayer:m_whitePlayer))
     {
-        m_piece->SetPosition(Coords(position));
+        m_piece->SetPosition(position);
         ChangeActivePlayer();
     }
     else
-        m_piece->SetPosition(Coords(m_savedCoords));
+        m_piece->SetPosition(m_savedCoords);
     m_piece.clear();
+    if ((m_whitePlayer->isLoose()) || (m_blackPlayer->isLoose()))
+        StopGame();
 }
 
 void ChessBoard::mouseMoveEvent(QMouseEvent * event)
 {
-    QPoint position = event->pos();
+    Coordinates position(event->pos(), true);
     if (m_piece.isNull())
         return;
-    m_piece->SetPosition(Coords(position));
+    m_piece->SetPosition(position);
 }
 
 QPointer<Player> ChessBoard::GetActivePlayer()
