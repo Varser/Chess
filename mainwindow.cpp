@@ -8,7 +8,7 @@
 
 #include <QCloseEvent>
 
-const QSize g_k_windowSize(820, 850);
+const QSize g_k_windowSize(820, 900);
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),

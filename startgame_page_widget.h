@@ -12,9 +12,6 @@ public:
     explicit StartGame_page_widget(QWidget *parent = 0);
 
 private:
-    void SaveGame();
-
-private:
     ChessBoard m_chessBoard;
     QWidget m_menu;
 signals:

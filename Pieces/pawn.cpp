@@ -13,8 +13,13 @@ Pawn::Pawn(Color position, QWidget *parent) :
     this->setFixedSize(g_k_PieceSize);
 }
 
-bool Pawn::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player>& friends, QPointer<Player>& enemies)
+bool Pawn::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player> friends, QPointer<Player>& enemies, bool CheckForCheck/* = true*/)
 {
+    if (CheckForCheck)
+    {
+        if (enemies->MaySomebodyGoHere(friends->GetKing(), friends))
+            return false;
+    }
     if ((position.x() == prev_position.x()) && (position.y() == prev_position.y()))
         return false;
 
@@ -30,7 +35,9 @@ bool Pawn::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<
             piece = enemies->GetPiece(position);
             if (!piece.isNull())
             {
-                enemies->RemovePiece(piece);
+                if (CheckForCheck)
+                    enemies->RemovePiece(piece);
+
                 return true;
             }
             return false;
@@ -46,7 +53,8 @@ bool Pawn::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<
             piece = enemies->GetPiece(position);
             if (!piece.isNull())
             {
-                enemies->RemovePiece(piece);
+                if (CheckForCheck)
+                    enemies->RemovePiece(piece);
                 return true;
             }
             return false;

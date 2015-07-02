@@ -33,7 +33,6 @@ void ChessBoard::StartGame()
 
 void ChessBoard::StopGame()
 {
-    Logger::GetLogger().clearLog();
     this->setMouseTracking(false);
 }
 
@@ -64,9 +63,11 @@ void ChessBoard::mouseReleaseEvent(QMouseEvent * event)
                                 (GetActivePlayer() == m_whitePlayer)?m_whitePlayer:m_blackPlayer,
                                 (GetActivePlayer() == m_whitePlayer)?m_blackPlayer:m_whitePlayer))
     {
-        Logger::GetLogger().AddToLog(position);
         m_piece->SetPosition(position);
         ChangeActivePlayer();
+        Logger::Set(std::pair<Coordinates, Coordinates>(m_savedCoords, position));
+        m_whitePlayer->IncrementMove();
+        m_blackPlayer->IncrementMove();
     }
     else
         m_piece->SetPosition(m_savedCoords);
@@ -98,10 +99,66 @@ void ChessBoard::ChangeActivePlayer()
     m_blackPlayer->SetActivePlayer(!m_blackPlayer->isActivePlayer());
 }
 
-void ChessBoard::SetActivePlayerPieceCoordinates(Coordinates current, Coordinates prev)
+void ChessBoard::SetStepWithKillIfNeed(std::pair<Coordinates, Coordinates> step)
 {
-    GetActivePlayer()->GetPiece(prev)->SetPosition(current);
+    QPointer<Player> player = GetActivePlayer();
+    m_piece = player->GetPiece(step.first);
+    if (m_piece.isNull())
+        return;
+    if (m_piece->MayIGoHere(step.second,
+                                step.first,
+                                (GetActivePlayer() == m_whitePlayer)?m_whitePlayer:m_blackPlayer,
+                                (GetActivePlayer() == m_whitePlayer)?m_blackPlayer:m_whitePlayer))
+    {
+        m_piece->SetPosition(step.second);
+        ChangeActivePlayer();
+        m_whitePlayer->IncrementMove();
+        m_blackPlayer->IncrementMove();
+    }
+    m_piece.clear();
 }
 
-]
+void ChessBoard::SetStepWithRestoreIfNeed(std::pair<Coordinates, Coordinates> step)
+{
+    QPointer<Player> player = GetActivePlayer();
+    m_piece = player->GetPiece(step.first);
+    if (m_piece.isNull())
+        return;
 
+    m_piece->SetPosition(step.second);
+    ChangeActivePlayer();
+    m_piece.clear();
+    GetActivePlayer()->Restore(step.first, Logger::GetMoveNumber());
+    m_whitePlayer->DecrementMove();
+    m_blackPlayer->DecrementMove();
+
+}
+
+void ChessBoard::Prev()
+{
+    std::pair<Coordinates, Coordinates> step = Logger::Prev();
+    if (step == std::pair<Coordinates, Coordinates>())
+        return;
+    std::pair<Coordinates, Coordinates> reverce_step = std::pair<Coordinates, Coordinates>(step.second, step.first);
+    ChangeActivePlayer();
+    SetStepWithRestoreIfNeed(reverce_step);
+    ChangeActivePlayer();
+}
+
+void ChessBoard::Next()
+{
+    std::pair<Coordinates, Coordinates> step = Logger::Next();
+    if (step == std::pair<Coordinates, Coordinates>())
+        return;
+    SetStepWithKillIfNeed(step);
+}
+
+void ChessBoard::Save()
+{
+    Logger::SaveLog();
+}
+
+void ChessBoard::Load()
+{
+    Logger::LoadLog();
+}

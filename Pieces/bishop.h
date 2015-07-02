@@ -7,7 +7,7 @@ class Bishop : public Piece
 {
 public:
     Bishop(Color position, QWidget *parent = 0);
-    virtual bool MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player>& friends, QPointer<Player>& enemies);
+    virtual bool MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player> friends, QPointer<Player>& enemies, bool CheckForCheck = true);
 };
 
 #endif // BISHOP_H

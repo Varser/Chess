@@ -4,13 +4,14 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 
-#include "logger.h"
+#include"logger.h"
 
 LoadGame_page_widget::LoadGame_page_widget(QWidget *parent) :
     QWidget(parent),
     m_chessBoard(this),
     m_menu(this)
 {
+    m_chessBoard.StopGame();
     //Add ChessBoard
     QVBoxLayout * v_layout = new QVBoxLayout(this);
     v_layout->addWidget(&m_chessBoard);
@@ -19,6 +20,20 @@ LoadGame_page_widget::LoadGame_page_widget(QWidget *parent) :
     QHBoxLayout * h_layout = new QHBoxLayout();
     v_layout->addLayout(h_layout);
     QPushButton * button;
+
+    //Add Prev Button
+    button= new QPushButton("Prev", this);
+    h_layout->addWidget(button);
+    this->connect(button, SIGNAL(clicked()), &m_chessBoard, SLOT(Prev()));
+
+    //Add Next Button
+    button= new QPushButton("Next", this);
+    h_layout->addWidget(button);
+    this->connect(button, SIGNAL(clicked()), &m_chessBoard, SLOT(Next()));
+
+    //Add horisontal layout for buttons
+    h_layout = new QHBoxLayout();
+    v_layout->addLayout(h_layout);
 
     //Add Main menu Button
     button= new QPushButton("Main Menu", this);
@@ -40,21 +55,14 @@ LoadGame_page_widget::LoadGame_page_widget(QWidget *parent) :
     this->connect(button, SIGNAL(clicked()), this->parent(), SLOT(close()));
     h_layout->addWidget(button);
     m_chessBoard.InitPlayers();
-}
-
-void LoadGame_page_widget::Prev()
-{
-    Logger::GetLogger().GoToPrevMove();
-    m_chessBoard->SetActivePlayerPieceCoordinates(Logger::GetLogger().GetMove());
-}
-
-void LoadGame_page_widget::Next()
-{
-    Logger::GetLogger().GoToNextMove();
-    m_chessBoard->SetActivePlayerPieceCoordinates(Logger::GetLogger().GetMove());
-}
-void LoadGame_page_widget::StartFromThis()
-{
-    m_chessBoard->StartGame();
+    Logger::LoadLog();
+    if (!Logger::isEmpty())
+    {
+        std::vector<std::pair<Coordinates, Coordinates> > log = Logger::GetLog();
+        for (std::vector<std::pair<Coordinates, Coordinates> >::iterator iter = log.begin(); iter != log.end(); ++iter)
+        {
+            m_chessBoard.SetStepWithKillIfNeed(*iter);
+        }
+    }
 }
 

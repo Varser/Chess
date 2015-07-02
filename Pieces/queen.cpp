@@ -13,8 +13,13 @@ Queen::Queen(Color position, QWidget *parent) :
     this->setFixedSize(g_k_PieceSize);
 }
 
-bool Queen::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player>& friends, QPointer<Player>& enemies)
+bool Queen::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player> friends, QPointer<Player>& enemies, bool CheckForCheck/* = true*/)
 {
+    if (CheckForCheck)
+    {
+        if (enemies->MaySomebodyGoHere(friends->GetKing(), friends))
+            return false;
+    }
     if ((position.x() == prev_position.x()) && (position.y() == prev_position.y()))
         return false;
 
@@ -28,8 +33,11 @@ bool Queen::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer
     {
         for (int x = position.x(), y = position.y(); x != prev_position.x(), y != prev_position.y(); (position.x() < prev_position.x())?++x:--x, (position.y() < prev_position.y())?++y:--y)
         {
-            if (!(friends->GetAnotherPiece(Coordinates(x, y), this).isNull()))
-                return false;
+            if ((position != Coordinates(x, y)) || CheckForCheck)
+            {
+                if (!(friends->GetAnotherPiece(Coordinates(x, y), this).isNull()))
+                    return false;
+            }
             QPointer<Piece> piece = enemies->GetPiece(Coordinates(x, y));
             if (!piece.isNull())
             {
@@ -48,9 +56,12 @@ bool Queen::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer
         case true:
             for (int y = position.y(); y != prev_position.y(); (position.y() < prev_position.y())?++y:--y)
             {
-                if (!(friends->GetAnotherPiece(Coordinates(position.x(), y), this).isNull()))
-                    return false;
-                piece = enemies->GetAnotherPiece(Coordinates(position.x(), y), this);
+                if ((position != Coordinates(position.x(), y)) || CheckForCheck)
+                {
+                    if (!(friends->GetAnotherPiece(Coordinates(position.x(), y), this).isNull()))
+                        return false;
+                }
+                piece = enemies->GetPiece(Coordinates(position.x(), y));
                 if (!piece.isNull())
                 {
                     if (y == position.y())
@@ -63,8 +74,11 @@ bool Queen::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer
         case false:
             for (int x = position.x(); x != prev_position.x(); (position.x() < prev_position.x())?++x:--x)
             {
-                if (!(friends->GetAnotherPiece(Coordinates(x, position.y()), this).isNull()))
-                    return false;
+                if ((position != Coordinates(x, position.y())) || CheckForCheck)
+                {
+                    if (!(friends->GetAnotherPiece(Coordinates(x, position.y()), this).isNull()))
+                        return false;
+                }
                 piece = enemies->GetPiece(Coordinates(x, position.y()));
                 if (!piece.isNull())
                 {
@@ -77,7 +91,7 @@ bool Queen::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer
             break;
         }
     }
-    if (!pieceForDelete.isNull())
+    if (!pieceForDelete.isNull() && CheckForCheck)
         enemies->RemovePiece(pieceForDelete);
     return true;
 }

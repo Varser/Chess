@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QVector>
 #include <QPointer>
+#include <QStack>
 
 #include"piece.h"
 
@@ -20,12 +21,19 @@ public:
     QPointer<Piece> GetPiece(Coordinates coordinates);
     QPointer<Piece> GetAnotherPiece(Coordinates coordinates, QPointer<Piece> excluded);
     void RemovePiece(QPointer<Piece> piece);
-    inline bool isLoose() const {return m_pieces.size();}
+    bool isLoose();
+    void Restore(Coordinates coordinates, size_t move);
+    bool MaySomebodyGoHere(Coordinates coordinates, QPointer<Player> emenies);
+    inline void DecrementMove() {--m_move;}
+    inline void IncrementMove() {++m_move;}
+    Coordinates GetKing();
 
 private:
     QVector<QPointer<Piece> > m_pieces;
+    QStack<std::pair<QPointer<Piece> , size_t> > m_killedPieces;
     QPointer<Piece> m_king;
     bool m_active;
+    size_t m_move;
 
 signals:
 

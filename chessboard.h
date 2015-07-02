@@ -22,11 +22,12 @@ public:
     void mousePressEvent(QMouseEvent * event);
     void mouseReleaseEvent(QMouseEvent * event);
     void mouseMoveEvent(QMouseEvent * event);
-    void ChangeActivePlayer();
-    void SetActivePlayerPieceCoordinates(Coordinates current, Coordinates prev);
+    void SetStepWithKillIfNeed(std::pair<Coordinates, Coordinates> step);
+    void SetStepWithRestoreIfNeed(std::pair<Coordinates, Coordinates> step);
 
 private:
     QPointer<Player> GetActivePlayer();
+    void ChangeActivePlayer();
 
 private:
     QPointer<Player>    m_whitePlayer,
@@ -38,6 +39,11 @@ private:
 signals:
 
 public slots:
+    void Prev();
+    void Next();
+    void Save();
+    void Load();
+
 };
 
 #endif // CHESSBOARD_H

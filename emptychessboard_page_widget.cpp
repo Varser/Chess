@@ -4,11 +4,15 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 
+#include "logger.h"
+
 EmptyChessBoard_page_widget::EmptyChessBoard_page_widget(QWidget *parent) :
     QWidget(parent),
     m_chessBoard(this),
     m_menu(this)
 {
+    m_chessBoard.StopGame();
+    Logger::Clear();
     //Add ChessBoard
     QVBoxLayout * v_layout = new QVBoxLayout(this);
     v_layout->addWidget(&m_chessBoard);

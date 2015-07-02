@@ -6,7 +6,9 @@
 #include "Pieces/pawn.h"
 #include "Pieces/bishop.h"
 
-Player::Player(QWidget *parent) : QWidget(parent)
+Player::Player(QWidget *parent) :
+    QWidget(parent),
+    m_move(0)
 {
 
 }
@@ -102,7 +104,7 @@ QPointer<Piece> Player::GetPiece(Coordinates coordinates)
 {
     for (int i = 0; i < m_pieces.size(); ++i)
     {
-        if (m_pieces[i]->IsItMyPosition(coordinates))
+        if (m_pieces[i]->IsItMyPosition(coordinates) && !m_pieces[i]->isHidden())
             return m_pieces[i];
     }
     return QPointer<Piece>();
@@ -114,17 +116,20 @@ void Player::RemovePiece(QPointer<Piece> piece)
     {
         for (int i = 0; i < m_pieces.size(); ++i)
         {
-            m_pieces[i]->close();
+            m_pieces[i]->hide();
+//            m_pieces[i]->close();
         }
-        m_pieces.clear();
+//        m_pieces.clear();
         return;
     }
     for (int i = 0; i < m_pieces.size(); ++i)
     {
         if (m_pieces[i] == piece)
         {
-            m_pieces[i]->close();
-            m_pieces.remove(i);
+            m_pieces[i]->hide();
+            m_killedPieces.push(std::pair<QPointer<Piece>, size_t>(m_pieces[i], m_move));
+//            m_pieces[i]->close();
+//            m_pieces.remove(i);
             break;
         }
     }
@@ -134,10 +139,46 @@ QPointer<Piece> Player::GetAnotherPiece(Coordinates coordinates, QPointer<Piece>
 {
     for (int i = 0; i < m_pieces.size(); ++i)
     {
-        if (m_pieces[i]->IsItMyPosition(coordinates) && (m_pieces[i] != excluded))
+        if (m_pieces[i]->IsItMyPosition(coordinates) && (m_pieces[i] != excluded) && (!m_pieces[i]->isHidden()))
             return m_pieces[i];
     }
     return QPointer<Piece>();
+}
+
+void Player::Restore(Coordinates coordinates, size_t move)
+{
+    if (m_killedPieces.empty())
+        return;
+    if (m_killedPieces.back().first->IsItMyPosition(coordinates) && (move == m_killedPieces.back().second))
+    {
+        m_killedPieces.back().first->show();
+        m_killedPieces.pop_back();
+    }
+}
+
+bool Player::isLoose()
+{
+    for (QVector<QPointer<Piece> >::iterator iter = m_pieces.begin(); iter != m_pieces.end(); ++iter)
+    {
+        if (!iter->data()->isHidden())
+            return false;
+    }
+    return true;
+}
+
+bool Player::MaySomebodyGoHere(Coordinates coordinates, QPointer<Player> enemies)
+{
+    for (QVector<QPointer<Piece> >::iterator iter = m_pieces.begin(); iter != m_pieces.end(); ++ iter)
+    {
+        if (iter->data()->MayIGoHere(coordinates, iter->data()->GetMyCoordinates(), static_cast<QPointer<Player> >(this), enemies, false))
+            return true;
+    }
+    return false;
+}
+
+Coordinates Player::GetKing()
+{
+    return m_king->GetMyCoordinates();
 }
 
 

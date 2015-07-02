@@ -87,6 +87,16 @@ public:
         return 7*g_k_PieceSize.height() - g_k_PieceSize.height()*(m_y - 1);
     }
 
+    inline bool operator==(const Coordinates& coordinates) const
+    {
+        return ((m_x == coordinates.m_x) && (m_y == coordinates.m_y));
+    }
+
+    inline bool operator!=(const Coordinates& coordinates) const
+    {
+        return ((m_x != coordinates.m_x) || (m_y != coordinates.m_y));
+    }
+
 private:
     qint8 m_x, m_y;
 };
@@ -102,7 +112,7 @@ class Piece : public QSvgWidget
     Q_OBJECT
 public:
     Piece(const QString& str, QWidget * wgt = 0) : QSvgWidget(str, wgt){}
-    virtual bool MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player>& friends, QPointer<Player>& enemies) = 0;
+    virtual bool MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player> friends, QPointer<Player>& enemies, bool CheckForCheck = true) = 0;
     inline bool IsItMyPosition(Coordinates coordinates) const
     {
        return ((m_coordinates.x() ==  coordinates.AbstractCoordinates().x()) && (m_coordinates.y() ==  coordinates.AbstractCoordinates().y()));
@@ -112,6 +122,11 @@ public:
     {
         this->m_coordinates = coordinates.AbstractCoordinates();
         this->move(coordinates.RealCoordinates());
+    }
+
+    inline Coordinates GetMyCoordinates()
+    {
+        return this->m_coordinates;
     }
 
 protected:

@@ -14,8 +14,14 @@ King::King(Color position, QWidget *parent) :
     this->setFixedSize(g_k_PieceSize);
 }
 
+bool King::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player> friends, QPointer<Player>& enemies, bool CheckForCheck/* = true*/)
 bool King::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player>& friends, QPointer<Player>& enemies)
 {
+    if (CheckForCheck)
+    {
+        if (enemies->MaySomebodyGoHere(friends->GetKing(), friends))
+            return false;
+    }
     if ((position.x() == prev_position.x()) && (position.y() == prev_position.y()))
         return false;
 
@@ -28,6 +34,13 @@ bool King::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<
     if (!((dx < 2) &&
             (dy < 2)))
         return false;
+    if (CheckForCheck)
+    {
+        if (!(friends->GetAnotherPiece(position, this).isNull()))
+            return false;
+    }
+    QPointer<Piece> piece = enemies->GetPiece(position);
+    if (!piece.isNull() && CheckForCheck)
     if (!friends->GetAnotherPiece(position, this).isNull())
         return false;
     QPointer<Piece> piece = enemies->GetPiece(position);

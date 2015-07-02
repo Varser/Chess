@@ -15,8 +15,13 @@ Bishop::Bishop(Color position, QWidget *parent) :
     this->setFixedSize(g_k_PieceSize);
 }
 
-bool Bishop::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player>& friends, QPointer<Player>& enemies)
+bool Bishop::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player> friends, QPointer<Player>& enemies, bool CheckForCheck/* = true*/)
 {
+    if (CheckForCheck)
+    {
+        if (enemies->MaySomebodyGoHere(friends->GetKing(), friends))
+            return false;
+    }
     if ((position.x() == prev_position.x()) && (position.y() == prev_position.y()))
         return false;
     if ((prev_position.y() - prev_position.x() != position.y() - position.x()) &&
@@ -25,8 +30,11 @@ bool Bishop::MayIGoHere(Coordinates position, Coordinates prev_position, QPointe
     QPointer<Piece> pieceForDelete;
     for (int x = position.x(), y = position.y(); x != prev_position.x(), y != prev_position.y(); (position.x() < prev_position.x())?++x:--x, (position.y() < prev_position.y())?++y:--y)
     {
-        if (!(friends->GetAnotherPiece(Coordinates(x, y), this).isNull()))
-            return false;
+        if ((position != Coordinates(x, y)) || CheckForCheck)
+        {
+            if (!(friends->GetAnotherPiece(Coordinates(x, y), this).isNull()))
+                return false;
+        }
         QPointer<Piece> piece = enemies->GetPiece(Coordinates(x, y));
         if (!piece.isNull())
         {
@@ -36,7 +44,7 @@ bool Bishop::MayIGoHere(Coordinates position, Coordinates prev_position, QPointe
                 return false;
         }
     }
-    if (!pieceForDelete.isNull())
+    if (!pieceForDelete.isNull() && CheckForCheck)
         enemies->RemovePiece(pieceForDelete);
     return true;
 }

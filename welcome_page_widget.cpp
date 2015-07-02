@@ -4,10 +4,12 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 
+#include "logger.h"
+
 Welcome_page_widget::Welcome_page_widget(QWidget *parent) :
     QWidget(parent)
 {
-
+    Logger::Clear();
     QVBoxLayout * layout = new QVBoxLayout(this);
     QPushButton * button;
 
