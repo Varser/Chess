@@ -15,14 +15,6 @@ Queen::Queen(Color position, QWidget *parent) :
 
 bool Queen::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player> friends, QPointer<Player>& enemies, bool CheckForCheck/* = true*/)
 {
-    if (CheckForCheck)
-    {
-        if (enemies->MaySomebodyGoHere(friends->GetKing(), friends))
-            return false;
-    }
-    if ((position.x() == prev_position.x()) && (position.y() == prev_position.y()))
-        return false;
-
     if ((prev_position.x() != position.x()) &&
                         (prev_position.y() != position.y()) &&
                         (prev_position.y() - prev_position.x() != position.y() - position.x()) &&
@@ -44,7 +36,11 @@ bool Queen::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer
                 if ((x == position.x()) && (y == position.y()))
                     pieceForDelete = piece;
                 else
+                {
+                    piece.clear();
                     return false;
+                }
+                piece.clear();
             }
         }
     }
@@ -59,7 +55,10 @@ bool Queen::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer
                 if ((position != Coordinates(position.x(), y)) || CheckForCheck)
                 {
                     if (!(friends->GetAnotherPiece(Coordinates(position.x(), y), this).isNull()))
+                    {
+                        pieceForDelete.clear();
                         return false;
+                    }
                 }
                 piece = enemies->GetPiece(Coordinates(position.x(), y));
                 if (!piece.isNull())
@@ -67,7 +66,12 @@ bool Queen::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer
                     if (y == position.y())
                         pieceForDelete = piece;
                     else
+                    {
+                        piece.clear();
+                        pieceForDelete.clear();
                         return false;
+                    }
+                    piece.clear();
                 }
             }
             break;
@@ -77,7 +81,10 @@ bool Queen::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer
                 if ((position != Coordinates(x, position.y())) || CheckForCheck)
                 {
                     if (!(friends->GetAnotherPiece(Coordinates(x, position.y()), this).isNull()))
+                    {
+                        pieceForDelete.clear();
                         return false;
+                    }
                 }
                 piece = enemies->GetPiece(Coordinates(x, position.y()));
                 if (!piece.isNull())
@@ -85,13 +92,30 @@ bool Queen::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer
                     if (x == position.x())
                         pieceForDelete = piece;
                     else
+                    {
+                        piece.clear();
+                        pieceForDelete.clear();
                         return false;
+                    }
+                    piece.clear();
                 }
             }
             break;
         }
     }
+
+    if (CheckForCheck)
+    {
+        if (enemies->MaySomebodyGoHere(friends->GetKing(), friends, pieceForDelete))
+        {
+            pieceForDelete.clear();
+            return false;
+        }
+    }
+
     if (!pieceForDelete.isNull() && CheckForCheck)
         enemies->RemovePiece(pieceForDelete);
+
+    pieceForDelete.clear();
     return true;
 }

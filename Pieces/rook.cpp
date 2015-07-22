@@ -15,17 +15,10 @@ Rook::Rook(Color position, QWidget *parent) :
 
 bool Rook::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player> friends, QPointer<Player>& enemies, bool CheckForCheck/* = true*/)
 {
-    if (CheckForCheck)
-    {
-        if (enemies->MaySomebodyGoHere(friends->GetKing(), friends))
-            return false;
-    }
-    if ((position.x() == prev_position.x()) && (position.y() == prev_position.y()))
-        return false;
-
     if (!((prev_position.x() == position.x()) ||
                        (prev_position.y() == position.y())))
         return false;
+
     QPointer<Piece> piece;
     QPointer<Piece> pieceForDelete;
     switch ((prev_position.x() == position.x()))
@@ -54,7 +47,10 @@ bool Rook::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<
             if ((position != Coordinates(x, position.y())) || CheckForCheck)
             {
                 if (!(friends->GetAnotherPiece(Coordinates(x, position.y()), this).isNull()))
+                {
+                    pieceForDelete.clear();
                     return false;
+                }
             }
             piece = enemies->GetPiece(Coordinates(x, position.y()));
             if (!piece.isNull())
@@ -62,12 +58,27 @@ bool Rook::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<
                 if (x == position.x())
                     pieceForDelete = piece;
                 else
+                {
+                    pieceForDelete.clear();
                     return false;
+                }
             }
         }
         break;
     }
+
+    if (CheckForCheck)
+    {
+        if (enemies->MaySomebodyGoHere(friends->GetKing(), friends, pieceForDelete))
+        {
+            pieceForDelete.clear();
+            return false;
+        }
+    }
+
     if (!pieceForDelete.isNull() && CheckForCheck)
-        enemies->RemovePiece(piece);
+        enemies->RemovePiece(pieceForDelete);
+
+    pieceForDelete.clear();
     return true;
 }

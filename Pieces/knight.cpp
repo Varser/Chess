@@ -15,11 +15,6 @@ Knight::Knight(Color position, QWidget *parent) :
 
 bool Knight::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player> friends, QPointer<Player>& enemies, bool CheckForCheck/* = true*/)
 {
-    if (CheckForCheck)
-    {
-        if (enemies->MaySomebodyGoHere(friends->GetKing(), friends))
-            return false;
-    }
     int dx = position.x() - prev_position.x();
     int dy = position.y() - prev_position.y();
     if (dx < 0)
@@ -35,10 +30,19 @@ bool Knight::MayIGoHere(Coordinates position, Coordinates prev_position, QPointe
             return false;
     }
     QPointer<Piece> piece = enemies->GetPiece(position);
+    if (CheckForCheck)
+    {
+        if (enemies->MaySomebodyGoHere(friends->GetKing(), friends, piece))
+        {
+            piece.clear();
+            return false;
+        }
+    }
+
     if (!piece.isNull() && CheckForCheck)
     {
         enemies->RemovePiece(piece);
-        return true;
     }
+    piece.clear();
     return true;
 }

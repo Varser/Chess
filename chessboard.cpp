@@ -2,6 +2,7 @@
 
 #include <QString>
 #include <cassert>
+
 #include "logger.h"
 
 
@@ -10,7 +11,8 @@ const QString k_backgroundFilePath = ":/Images/Chess_Board.svg";
 extern const QSize g_k_chessBoardSize(800, 800);
 
 ChessBoard::ChessBoard(QWidget *parent) :
-    QSvgWidget(k_backgroundFilePath, parent)
+    QSvgWidget(k_backgroundFilePath, parent),
+    m_track(false)
 {
     this->setGeometry(0, 0, g_k_chessBoardSize.width(), g_k_chessBoardSize.height());
     this->setFixedSize(g_k_chessBoardSize);
@@ -28,23 +30,20 @@ void ChessBoard::InitPlayers()
 
 void ChessBoard::StartGame()
 {
+    m_track = true;
     this->setMouseTracking(true);
 }
 
 void ChessBoard::StopGame()
 {
+    m_track = false;
     this->setMouseTracking(false);
-}
-
-QPair<QPointer<Player>, QPointer<Player> > ChessBoard::GetPlayers()
-{
-    assert(m_whitePlayer);
-    assert(m_blackPlayer);
-    return QPair<QPointer<Player>, QPointer<Player> >(m_whitePlayer, m_blackPlayer);
 }
 
 void ChessBoard::mousePressEvent(QMouseEvent * event)
 {
+    if (!m_track)
+        return;
     Coordinates position(event->pos(), true);
     QPointer<Player> player = GetActivePlayer();
     m_piece = player->GetPiece(position);
@@ -56,14 +55,16 @@ void ChessBoard::mousePressEvent(QMouseEvent * event)
 void ChessBoard::mouseReleaseEvent(QMouseEvent * event)
 {
     Coordinates position(event->pos(), true);
-    if (m_piece.isNull())
+    if (!m_track ||
+            (position == m_savedCoords) ||
+            m_piece.isNull() || m_piece->isHidden())
         return;
+    m_piece->SetPosition(position);
     if (m_piece->MayIGoHere(position,
                                 m_savedCoords,
                                 (GetActivePlayer() == m_whitePlayer)?m_whitePlayer:m_blackPlayer,
                                 (GetActivePlayer() == m_whitePlayer)?m_blackPlayer:m_whitePlayer))
     {
-        m_piece->SetPosition(position);
         ChangeActivePlayer();
         Logger::Set(std::pair<Coordinates, Coordinates>(m_savedCoords, position));
         m_whitePlayer->IncrementMove();
@@ -78,6 +79,8 @@ void ChessBoard::mouseReleaseEvent(QMouseEvent * event)
 
 void ChessBoard::mouseMoveEvent(QMouseEvent * event)
 {
+    if (!m_track)
+        return;
     Coordinates position(event->pos(), true);
     if (m_piece.isNull())
         return;
@@ -86,11 +89,7 @@ void ChessBoard::mouseMoveEvent(QMouseEvent * event)
 
 QPointer<Player> ChessBoard::GetActivePlayer()
 {
-    if (m_whitePlayer->isActivePlayer())
-        return m_whitePlayer;
-    else if (m_blackPlayer->isActivePlayer())
-        return m_blackPlayer;
-    return QPointer<Player>();
+    return (m_whitePlayer->isActivePlayer())?m_whitePlayer:m_blackPlayer;
 }
 
 void ChessBoard::ChangeActivePlayer()
@@ -103,19 +102,20 @@ void ChessBoard::SetStepWithKillIfNeed(std::pair<Coordinates, Coordinates> step)
 {
     QPointer<Player> player = GetActivePlayer();
     m_piece = player->GetPiece(step.first);
+    player.clear();
     if (m_piece.isNull())
         return;
-    if (m_piece->MayIGoHere(step.second,
-                                step.first,
-                                (GetActivePlayer() == m_whitePlayer)?m_whitePlayer:m_blackPlayer,
-                                (GetActivePlayer() == m_whitePlayer)?m_blackPlayer:m_whitePlayer))
-    {
-        m_piece->SetPosition(step.second);
-        ChangeActivePlayer();
-        m_whitePlayer->IncrementMove();
-        m_blackPlayer->IncrementMove();
-    }
+    m_piece->SetPosition(step.second);
     m_piece.clear();
+    ChangeActivePlayer();
+    player = GetActivePlayer();
+    m_piece = player->GetPiece(step.second);
+    if (!m_piece.isNull())
+        player->RemovePiece(m_piece);
+    m_piece.clear();
+    player.clear();
+    m_whitePlayer->IncrementMove();
+    m_blackPlayer->IncrementMove();
 }
 
 void ChessBoard::SetStepWithRestoreIfNeed(std::pair<Coordinates, Coordinates> step)
@@ -128,7 +128,7 @@ void ChessBoard::SetStepWithRestoreIfNeed(std::pair<Coordinates, Coordinates> st
     m_piece->SetPosition(step.second);
     ChangeActivePlayer();
     m_piece.clear();
-    GetActivePlayer()->Restore(step.first, Logger::GetMoveNumber());
+    GetActivePlayer()->Restore(Logger::GetMoveNumber());
     m_whitePlayer->DecrementMove();
     m_blackPlayer->DecrementMove();
 

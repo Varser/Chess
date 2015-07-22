@@ -112,14 +112,15 @@ QPointer<Piece> Player::GetPiece(Coordinates coordinates)
 
 void Player::RemovePiece(QPointer<Piece> piece)
 {
+    if (piece.isNull())
+        return;
     if (piece == m_king)
     {
         for (int i = 0; i < m_pieces.size(); ++i)
         {
             m_pieces[i]->hide();
-//            m_pieces[i]->close();
+            m_killedPieces.push(std::pair<QPointer<Piece>, size_t>(m_pieces[i], m_move));
         }
-//        m_pieces.clear();
         return;
     }
     for (int i = 0; i < m_pieces.size(); ++i)
@@ -128,8 +129,6 @@ void Player::RemovePiece(QPointer<Piece> piece)
         {
             m_pieces[i]->hide();
             m_killedPieces.push(std::pair<QPointer<Piece>, size_t>(m_pieces[i], m_move));
-//            m_pieces[i]->close();
-//            m_pieces.remove(i);
             break;
         }
     }
@@ -137,6 +136,8 @@ void Player::RemovePiece(QPointer<Piece> piece)
 
 QPointer<Piece> Player::GetAnotherPiece(Coordinates coordinates, QPointer<Piece> excluded)
 {
+    if (excluded.isNull())
+        return GetPiece(coordinates);
     for (int i = 0; i < m_pieces.size(); ++i)
     {
         if (m_pieces[i]->IsItMyPosition(coordinates) && (m_pieces[i] != excluded) && (!m_pieces[i]->isHidden()))
@@ -145,14 +146,16 @@ QPointer<Piece> Player::GetAnotherPiece(Coordinates coordinates, QPointer<Piece>
     return QPointer<Piece>();
 }
 
-void Player::Restore(Coordinates coordinates, size_t move)
+void Player::Restore(size_t move)
 {
     if (m_killedPieces.empty())
         return;
-    if (m_killedPieces.back().first->IsItMyPosition(coordinates) && (move == m_killedPieces.back().second))
+    while (move == m_killedPieces.back().second)
     {
         m_killedPieces.back().first->show();
         m_killedPieces.pop_back();
+        if (m_killedPieces.empty())
+            return;
     }
 }
 
@@ -166,10 +169,12 @@ bool Player::isLoose()
     return true;
 }
 
-bool Player::MaySomebodyGoHere(Coordinates coordinates, QPointer<Player> enemies)
+bool Player::MaySomebodyGoHere(Coordinates coordinates, QPointer<Player> enemies, QPointer<Piece> deletePiece)
 {
     for (QVector<QPointer<Piece> >::iterator iter = m_pieces.begin(); iter != m_pieces.end(); ++ iter)
     {
+        if (deletePiece == *iter || iter->data()->isHidden())
+            continue;
         if (iter->data()->MayIGoHere(coordinates, iter->data()->GetMyCoordinates(), static_cast<QPointer<Player> >(this), enemies, false))
             return true;
     }

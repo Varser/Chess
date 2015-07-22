@@ -22,8 +22,8 @@ public:
     QPointer<Piece> GetAnotherPiece(Coordinates coordinates, QPointer<Piece> excluded);
     void RemovePiece(QPointer<Piece> piece);
     bool isLoose();
-    void Restore(Coordinates coordinates, size_t move);
-    bool MaySomebodyGoHere(Coordinates coordinates, QPointer<Player> emenies);
+    void Restore(size_t move);
+    bool MaySomebodyGoHere(Coordinates coordinates, QPointer<Player> emenies, QPointer<Piece> deletePiece);
     inline void DecrementMove() {--m_move;}
     inline void IncrementMove() {++m_move;}
     Coordinates GetKing();
@@ -34,10 +34,6 @@ private:
     QPointer<Piece> m_king;
     bool m_active;
     size_t m_move;
-
-signals:
-
-public slots:
 };
 
 #endif // PLAYER_H

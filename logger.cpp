@@ -27,8 +27,6 @@ std::pair<Coordinates, Coordinates> Logger::Prev()
 
 std::pair<Coordinates, Coordinates> Logger::Next()
 {
-//    if (!s_m_position)
-//        return std::pair<Coordinates, Coordinates>();
     if (s_m_position < s_m_steps.size())
         ++s_m_position;
     return s_m_steps[s_m_position - 1];

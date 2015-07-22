@@ -1,10 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "welcome_page_widget.h"
-#include "startgame_page_widget.h"
-#include "loadgame_page_widget.h"
-#include "emptychessboard_page_widget.h"
+#include "Widgets/welcome_page_widget.h"
+#include "Widgets/startgame_page_widget.h"
+#include "Widgets/loadgame_page_widget.h"
+#include "Widgets/emptychessboard_page_widget.h"
 
 #include <QCloseEvent>
 

@@ -15,10 +15,6 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    welcome_page_widget.cpp \
-    startgame_page_widget.cpp \
-    loadgame_page_widget.cpp \
-    emptychessboard_page_widget.cpp \
     player.cpp \
     chessboard.cpp \
     Pieces/bishop.cpp \
@@ -27,13 +23,13 @@ SOURCES += main.cpp\
     Pieces/knight.cpp \
     Pieces/pawn.cpp \
     Pieces/rook.cpp \
-    logger.cpp
+    logger.cpp \
+    Widgets/emptychessboard_page_widget.cpp \
+    Widgets/loadgame_page_widget.cpp \
+    Widgets/startgame_page_widget.cpp \
+    Widgets/welcome_page_widget.cpp
 
 HEADERS  += mainwindow.h \
-    welcome_page_widget.h \
-    startgame_page_widget.h \
-    loadgame_page_widget.h \
-    emptychessboard_page_widget.h \
     player.h \
     chessboard.h \
     piece.h \
@@ -43,7 +39,12 @@ HEADERS  += mainwindow.h \
     Pieces/knight.h \
     Pieces/pawn.h \
     Pieces/rook.h \
-    logger.h
+    logger.h \
+    coordsandcolor.h \
+    Widgets/emptychessboard_page_widget.h \
+    Widgets/loadgame_page_widget.h \
+    Widgets/startgame_page_widget.h \
+    Widgets/welcome_page_widget.h
 
 FORMS    += mainwindow.ui
 

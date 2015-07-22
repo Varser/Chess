@@ -15,16 +15,9 @@ Pawn::Pawn(Color position, QWidget *parent) :
 
 bool Pawn::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<Player> friends, QPointer<Player>& enemies, bool CheckForCheck/* = true*/)
 {
-    if (CheckForCheck)
-    {
-        if (enemies->MaySomebodyGoHere(friends->GetKing(), friends))
-            return false;
-    }
-    if ((position.x() == prev_position.x()) && (position.y() == prev_position.y()))
-        return false;
-
     int dx = position.x() - prev_position.x();
     int dy = 0;
+
     QPointer<Piece> piece;
     switch(m_color)
     {
@@ -33,16 +26,10 @@ bool Pawn::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<
         if ((dy == 1) && ((dx == 1) || (dx == -1)))
         {
             piece = enemies->GetPiece(position);
-            if (!piece.isNull())
-            {
-                if (CheckForCheck)
-                    enemies->RemovePiece(piece);
-
-                return true;
-            }
-            return false;
+            if (piece.isNull() && CheckForCheck)
+                return false;
         }
-        if ((dx != 0) || ((dy != 1) &&
+        else if ((dx != 0) || ((dy != 1) &&
                 ((prev_position.y() == 2)?(dy != 2):true)))
                 return false;
         break;
@@ -51,24 +38,42 @@ bool Pawn::MayIGoHere(Coordinates position, Coordinates prev_position, QPointer<
         if ((dy == 1) && ((dx == 1) || (dx == -1)))
         {
             piece = enemies->GetPiece(position);
-            if (!piece.isNull())
-            {
-                if (CheckForCheck)
-                    enemies->RemovePiece(piece);
-                return true;
-            }
-            return false;
+            if (piece.isNull() && CheckForCheck)
+                return false;
         }
-        if ((dx != 0) || ((dy != 1) &&
+        else if ((dx != 0) || ((dy != 1) &&
                 ((prev_position.y() == 7)?(dy != 2):true)))
             return false;
     }
-    for (int y = position.y(); y != prev_position.y(); (position.y() < prev_position.y())?++y:--y)
+
+    if (dx == 0)
     {
-        if (!friends->GetAnotherPiece(Coordinates(position.x(), y), this).isNull())
-            return false;
-        if (!enemies->GetPiece(Coordinates(position.x(), y)).isNull())
-            return false;
+        for (int y = position.y(); y != prev_position.y(); (position.y() < prev_position.y())?++y:--y)
+        {
+            if (!friends->GetAnotherPiece(Coordinates(position.x(), y), this).isNull())
+            {
+                piece.clear();
+                return false;
+            }
+            if (!enemies->GetPiece(Coordinates(position.x(), y)).isNull())
+            {
+                piece.clear();
+                return false;
+            }
+        }
     }
+
+    if (CheckForCheck)
+    {
+        if (enemies->MaySomebodyGoHere(friends->GetKing(), friends, piece))
+        {
+            piece.clear();
+            return false;
+        }
+    }
+    if (CheckForCheck  && !piece.isNull())
+        enemies->RemovePiece(piece);
+
+    piece.clear();
     return true;
 }

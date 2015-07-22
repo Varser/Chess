@@ -16,14 +16,15 @@ class ChessBoard : public QSvgWidget
 public:
     explicit ChessBoard(QWidget *parent = 0);
     void InitPlayers();
-    QPair<QPointer<Player>, QPointer<Player> > GetPlayers();
     void StartGame();
     void StopGame();
+    void SetStepWithKillIfNeed(std::pair<Coordinates, Coordinates> step);
+    void SetStepWithRestoreIfNeed(std::pair<Coordinates, Coordinates> step);
+
+private:
     void mousePressEvent(QMouseEvent * event);
     void mouseReleaseEvent(QMouseEvent * event);
     void mouseMoveEvent(QMouseEvent * event);
-    void SetStepWithKillIfNeed(std::pair<Coordinates, Coordinates> step);
-    void SetStepWithRestoreIfNeed(std::pair<Coordinates, Coordinates> step);
 
 private:
     QPointer<Player> GetActivePlayer();
@@ -32,12 +33,9 @@ private:
 private:
     QPointer<Player>    m_whitePlayer,
                         m_blackPlayer;
-
-private:
     QPointer<Piece> m_piece;
     Coordinates m_savedCoords;
-signals:
-
+    bool m_track;
 public slots:
     void Prev();
     void Next();
